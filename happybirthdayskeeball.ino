@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // HAPPY BIRTHDAY SKEEBAL
 ////////////////////////////////////////////////////////////////////////////////
-Authors: Maxwell & Joshua Davis
+Authors: Maxwell Davis & Joshua Davis
 Date: 
 Description:
 
@@ -37,22 +37,24 @@ const int pinGameResetButton = 9;   // the number of the pushbutton pin
 const int pinBallDoorMotor = 10;    // the number of the motor pin
 const int pinScoreboardHigh = 11;   // the number of the Scoreboard High pin
 const int pinScoreboardCurrent = 12;// the number of the Scoreboard Current pin
-const int ledPin =  13;             // the number of the LED pin
+const int ledPin = 13;              // the number of the LED pin
+
+const int valueBallButton10 = 10;          //
+const int valueBallButton20 = 20;          // 
+const int valueBallButton30 = 30;          // 
+const int valueBallButton40 = 40;          //
+const int valueBallButton50 = 50;          //
+const int valueBallButton100Left = 100;     //
+const int valueBallButton100Right = 100;    // 
 
 
 //****************************************************************************//
 // Varaibles
 //****************************************************************************//
-int stateBallButton10 = 0;          //
-int stateBallButton20 = 0;          // 
-int stateBallButton30 = 0;          // 
-int stateBallButton40 = 0;          //
-int stateBallButton50 = 0;          //
-int stateBallButton100Left = 0;     //
-int stateBallButton100Right = 0;    // 
-int stateGameResetButton = 0;       // 
+int valueGameResetButton = 0;       // 
 int currentScore = 0;               // variable for keeping track of the current game's score
 int currentHighScore = 0;           // varialbe pulled from EEPROM to see current high score
+int ballCount = 0;                  // variable that keeps track of the balls
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -89,9 +91,11 @@ void AnnounceGameEnd() {
 void UpdateScoreboard() {
 
   // updated scoreboard to reflect currentScore
+  //currentScore....
 
+    
   // updated scoreboard to reflect currentHighScore
-
+  //currentHighScore....
 }
 
 
@@ -135,30 +139,20 @@ void RaiseBalldoor() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 //****************************************************************************//
-// SetHighScore - Used to write current highscore to longterm EEPROM memory
-//****************************************************************************//
-void SetHighScore() {
-  
-}
-
-
-//****************************************************************************//
-// CheckHighScore - Test the current highscore in the longterm EEPROM memory
-// to see if current score beats it
-//****************************************************************************//
-void CheckHighScore() {
-
-}
-
-
-//****************************************************************************//
 // IncrementScore - 
 //****************************************************************************//
-void IncrementScore( int ballDropButton ) {
+void IncrementScore( int ballScore ) {
 
-  //based on ballDropButton number, increment/add value to currentScore
+  //update the current score
+  currentScore = currentScore + ballScore;
 
+  //test for for high score
+  if (currentScore > currentHighScore) {
+    currentHighScore = currentScore;  
+  }
+  
   //run scoreboard and feedback methos
+  UpdateScoreboard();
 
 }
 
@@ -209,7 +203,79 @@ void setup() {
 void loop() {
 
   // check game restart button - lower ball-door and then reset Arduino
- 
-  // check balldrop button - increment score
+  if (digitalRead(pinGameResetButton) == LOW)
+  {
+    //call the methods exports new high score
+
+    //call method to reset Arduino...
+    
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // check balldrop count, if less than 9, determine button and increment score
+
+  if(ballCount == 9){
+    //call method to complete game...
+  }
+  else if( ballCount < 9 ){
+    //10 POINT BALL
+    if (digitalRead(pinBallButton10) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(10);
+      ballCount++;
+    }
+  
+    //20 POINT BALL
+    if (digitalRead(pinBallButton20) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(20);
+      ballCount++;
+    }
+  
+    //30 POINT BALL
+    if (digitalRead(pinBallButton30) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(30);
+      ballCount++;
+    }
+  
+    //40 POINT BALL
+    if (digitalRead(pinBallButton40) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(40);
+      ballCount++;
+    }
+  
+    //50 POINT BALL
+    if (digitalRead(pinBallButton50) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(50);
+      ballCount++;
+    }
+  
+    //100 POINT BALL LEFT
+    if (digitalRead(pinBallButton100Left) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(100);
+      ballCount++;
+    }
+  
+    //100 POINT BALL RIGHT
+    if (digitalRead(pinBallButton100Right) == LOW)
+    {
+      //call the function that increments and updates scoreboard
+      IncrementScore(100);
+      ballCount++;
+    }
+  
+  }//////if( ballCount < 9 )
+
 
 }
