@@ -38,7 +38,6 @@ const int pinBallDoorMotor = 10;    // the number of the motor pin
 const int pinScoreboardHigh = 11;   // the number of the Scoreboard High pin
 const int pinScoreboardCurrent = 12;// the number of the Scoreboard Current pin
 const int ledPin = 13;              // the number of the LED pin
-const int pinDebugLED = A1;
 
 const int valueBallButton10 = 10;          //
 const int valueBallButton20 = 20;          // 
@@ -50,7 +49,7 @@ const int valueBallButton100Right = 100;    //
 
 
 //****************************************************************************//
-// Variables
+// Varaibles
 //****************************************************************************//
 int valueGameResetButton = 0;       // 
 int currentScore = 0;               // variable for keeping track of the current game's score
@@ -178,8 +177,7 @@ void setup() {
   ////////////////////////////////////////
   ////////DEBUGGING initialize the LED pin
   pinMode(ledPin, OUTPUT);
-  pinMode(pinDebugLED, OUTPUT);
-  
+
   // pull current high score from EEPROM and set to global currentHighScore variable
 
   // setup score buttons
@@ -216,56 +214,29 @@ void loop() {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // check balldrop count, if less than 9, determine button and increment score
-  
+
   if(ballCount == 9){
     //call method to complete game...
-
-
-      digitalWrite(pinDebugLED, HIGH);
-      delay(100);
-      digitalWrite(pinDebugLED, LOW);
-      delay(100);
-      
-      digitalWrite(pinDebugLED, HIGH);
-      delay(50);
-      digitalWrite(pinDebugLED, LOW);
-      delay(50);
-
-      
-      digitalWrite(pinDebugLED, HIGH);
-      delay(25);
-      digitalWrite(pinDebugLED, LOW);
-      delay(25);
- 
- 
- 
-      
   }
   else if( ballCount < 9 ){
     //10 POINT BALL
-    if (digitalRead(pinBallButton10) == HIGH)
+    if (digitalRead(pinBallButton10) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(10);
       ballCount++;
-
-      digitalWrite(pinDebugLED, HIGH);
-      delay(200);
-      digitalWrite(pinDebugLED, LOW);
-      
     }
   
     //20 POINT BALL
-    if (digitalRead(pinBallButton20) == HIGH)
+    if (digitalRead(pinBallButton20) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(20);
       ballCount++;
-
     }
   
     //30 POINT BALL
-    if (digitalRead(pinBallButton30) == HIGH)
+    if (digitalRead(pinBallButton30) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(30);
@@ -273,7 +244,7 @@ void loop() {
     }
   
     //40 POINT BALL
-    if (digitalRead(pinBallButton40) == HIGH)
+    if (digitalRead(pinBallButton40) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(40);
@@ -281,7 +252,7 @@ void loop() {
     }
   
     //50 POINT BALL
-    if (digitalRead(pinBallButton50) == HIGH)
+    if (digitalRead(pinBallButton50) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(50);
@@ -289,7 +260,7 @@ void loop() {
     }
   
     //100 POINT BALL LEFT
-    if (digitalRead(pinBallButton100Left) == HIGH)
+    if (digitalRead(pinBallButton100Left) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(100);
@@ -297,7 +268,7 @@ void loop() {
     }
   
     //100 POINT BALL RIGHT
-    if (digitalRead(pinBallButton100Right) == HIGH)
+    if (digitalRead(pinBallButton100Right) == LOW)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(100);
