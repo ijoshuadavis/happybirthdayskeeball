@@ -13,10 +13,6 @@ Technical Specs:
 #include <EEPROM.h>
 #include "LedControl.h"
 
-LedControl lc=LedControl(A2,A4,A3,2);
-/* we always wait a bit between updates of the display */
-unsigned long delaytime=250;
-
 //////////////////////////////////////////////////////////////////////////////////////////
 // CONSTANTS AND VARIABLES
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -33,13 +29,16 @@ const int pinBallButton40 = 5;      // the number of the pushbutton pin
 const int pinBallButton50 = 6;      // the number of the pushbutton pin
 const int pinBallButton100Left = 7; // the number of the pushbutton pin
 const int pinBallButton100Right = 8;// the number of the pushbutton pin
-const int pinGameResetButton = 9;   // the number of the pushbutton pin
+const int pinGameResetButton = 9; 
+
 const int pinBallDoorMotor = A4;    // the number of the motor pin
-const int pinScoreboardHigh = 11;   // the number of the Scoreboard High pin
-const int pinScoreboardCurrent = 12;// the number of the Scoreboard Current pin
-const int ledPin = 13;              // the number of the LED pin
-const int pinDebugLED = A1;
-int val = 0;      // variable to store the read value
+const int pinScoreboardDataIn = A2; // the number of the Scoreboard High pin
+const int pinScoreboardCS = A4;     // the number of the Scoreboard Current pin
+const int pinScoreboardCLK = A3;    // the number of the Scoreboard Current pin
+const int pinReset = 12; 
+
+const int pinLED = 13;              // the number of the LED pin
+
 
 const int valueBallButton10 = 10;          //
 const int valueBallButton20 = 20;          // 
@@ -58,6 +57,7 @@ int currentScore = 0;               // variable for keeping track of the current
 int currentHighScore = 0;           // varialbe pulled from EEPROM to see current high score
 int ballCount = 0;                  // variable that keeps track of the balls
 
+LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScoreboardCLK,2);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // SCOREBOARD AND FEEDBACK METHODS
@@ -185,11 +185,27 @@ void IncrementScore( int ballScore ) {
 //****************************************************************************//
 void setup() {
 
-  ////////////////////////////////////////
-  ////////DEBUGGING initialize the LED pin
-  pinMode(ledPin, OUTPUT);
-  pinMode(pinDebugLED, OUTPUT);
-  Serial.begin(9600); // open the serial port at 9600 bps:
+
+    /*
+   The MAX72XX is in power-saving mode on startup,
+   we have to do a wakeup call
+   */
+  scoreBoards.shutdown(0,false);
+  scoreBoards.shutdown(1,false);
+  //delay(500);
+  scoreBoards.setIntensity(0,0);
+  scoreBoards.setIntensity(1,0);
+  //delay(500);
+  scoreBoards.clearDisplay(0);
+  scoreBoards.clearDisplay(1);
+  //delay(500);
+
+
+
+
+
+
+ 
   
   // pull current high score from EEPROM and set to global currentHighScore variable
 
@@ -201,31 +217,24 @@ void setup() {
   pinMode(pinBallButton50, INPUT);      // initialize the pushbutton pin as an input
   pinMode(pinBallButton100Left, INPUT); // initialize the pushbutton pin as an input
   pinMode(pinBallButton100Right, INPUT);// initialize the pushbutton pin as an input
+
+  // setup game reset button and pins for software reset after game over
+  pinMode(pinGameResetButton, INPUT);   // initialize the pushbutton pin as an input 
+  digitalWrite(pinReset, HIGH);
+  delay(200); 
+  pinMode(pinReset, OUTPUT); 
+
   
   // setup scoreboard and feedback
 
   // setup game restart button & raise ball-door
+  
   /// might need to pause the raise door to give the balls enough time to roll down
-  pinMode(pinGameResetButton, INPUT);   // initialize the pushbutton pin as an input
 
+  ////////////////////////////////////////
+  ////////DEBUGGING initialize the LED pin
+  pinMode(pinLED, OUTPUT);
 
-
-    /*
-   The MAX72XX is in power-saving mode on startup,
-   we have to do a wakeup call
-   */
-  lc.shutdown(0,false);
-  /* Set the brightness to a medium values */
-  lc.setIntensity(0,8);
-  /* and clear the display */
-  lc.clearDisplay(0);
-
-
-  lc.shutdown(1,false);
-  /* Set the brightness to a medium values */
-  lc.setIntensity(1,8);
-  /* and clear the display */
-  lc.clearDisplay(1);
 
 
 }
@@ -236,47 +245,53 @@ void setup() {
 void loop() {
 
   // check game restart button - lower ball-door and then reset Arduino
-  //if (digitalRead(pinGameResetButton) == LOW)
-  //{
-    //call the methods exports new high score
-    //call method to reset Arduino...
-    
-  //}
+  if (digitalRead(pinGameResetButton) == HIGH)
+  {
+    digitalWrite(pinLED, HIGH);
+    delay(5000);
+    digitalWrite(pinReset, LOW);
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // check balldrop count, if less than 9, determine button and increment score
     
+
   if(ballCount == 9){
     //call method to complete game...
-    Serial.print("Game Over");  // prints a label
-    Serial.print("\n");  // prints a label
+    //Serial.print("Game Over");  // prints a label
+    //Serial.print("\n");  // prints a label
 
-    lc.clearDisplay(0);
-    lc.clearDisplay(1);
+    scoreBoards.clearDisplay(0);
+    scoreBoards.clearDisplay(1);
 
-    lc.setIntensity(0,1);
-    lc.setIntensity(1,1);
+    digitalWrite(pinLED, HIGH);
+    delay(100);
+    digitalWrite(pinLED, LOW);
+    delay(100);
+    digitalWrite(pinLED, HIGH);
+    delay(100);
+    digitalWrite(pinLED, LOW);
 
-    delay(500);
+
 
     int number = currentScore;
     int i = 0;
     while (number > 0) {
-      lc.setDigit(0,i,number % 10,false);
+      scoreBoards.setDigit(0,i,number % 10,false);
       number = number / 10;
       i++;
     }
 
+    scoreBoards.setChar(1,0,'-',false);
+    scoreBoards.setChar(1,1,'-',false);
+    scoreBoards.setChar(1,2,'-',false);
+    scoreBoards.setChar(1,3,'-',false);
+    scoreBoards.setChar(1,4,'-',false);
+    scoreBoards.setChar(1,5,'-',false);
+    scoreBoards.setChar(1,6,'-',false);
+    scoreBoards.setChar(1,7,'-',false);
 
-    lc.setDigit(1,1,6,false);
-    lc.setDigit(1,2,6,false);
-    lc.setDigit(1,3,6,false);
-    lc.setDigit(1,4,6,false);
-    lc.setDigit(1,5,0,false);
-    lc.setDigit(1,6,0,false);
-    lc.setDigit(1,7,0,false);
-    lc.setDigit(1,8,0,false);
     delay(500);
  
  }      
@@ -288,24 +303,24 @@ void loop() {
       IncrementScore(10);
       ballCount++;
 
-      Serial.print("Score ");  // prints a label
-      Serial.print(currentScore, DEC);  // prints a label
-      Serial.print("\n");  // prints a label
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
 
-      digitalWrite(pinDebugLED, HIGH);
-      delay(400);
-      digitalWrite(pinDebugLED, LOW);
-
-      int number = currentScore;
-      int i = 0;
-      while (number > 0) {
-        lc.setDigit(0,i,number % 10,false);
-        number = number / 10;
-        i++;
-      }
+     // int number = currentScore;
+     // int i = 0;
+     // while (number > 0) {
+     //   scoreBoards.setDigit(0,i,number % 10,false);
+     //   number = number / 10;
+     //   i++;
+     // }
+      
+      //delay for button count...will probably need to leverage
+      delay(1000);
+      
       
     }
-/*  
+
     //20 POINT BALL
     if (digitalRead(pinBallButton20) == HIGH)
     {
@@ -313,14 +328,25 @@ void loop() {
       IncrementScore(20);
       ballCount++;
 
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
-  
+ 
     //30 POINT BALL
     if (digitalRead(pinBallButton30) == HIGH)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(30);
       ballCount++;
+
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
   
     //40 POINT BALL
@@ -329,6 +355,12 @@ void loop() {
       //call the function that increments and updates scoreboard
       IncrementScore(40);
       ballCount++;
+      
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
   
     //50 POINT BALL
@@ -337,6 +369,12 @@ void loop() {
       //call the function that increments and updates scoreboard
       IncrementScore(50);
       ballCount++;
+
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
   
     //100 POINT BALL LEFT
@@ -345,6 +383,12 @@ void loop() {
       //call the function that increments and updates scoreboard
       IncrementScore(100);
       ballCount++;
+
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
   
     //100 POINT BALL RIGHT
@@ -353,8 +397,13 @@ void loop() {
       //call the function that increments and updates scoreboard
       IncrementScore(100);
       ballCount++;
+
+      digitalWrite(pinLED, HIGH);
+      delay(1000);
+      digitalWrite(pinLED, LOW);
+      //delay for button count...will probably need to leverage
+      delay(1000);
     }
-*/
   }//////if( ballCount < 9 )
 
 
