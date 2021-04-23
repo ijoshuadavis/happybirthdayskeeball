@@ -55,7 +55,7 @@ int currentHighScore = 0;           // varialbe pulled from EEPROM to see curren
 int ballCount = 0;                  // variable that keeps track of the balls
 
 //Scoreboard initialization
-LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScoreboardCLK,1);
+LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScoreboardCLK,2);
 
 
 
@@ -98,17 +98,26 @@ void UpdateScoreboard() {
 
   // updated scoreboard to reflect currentScore
   scoreBoards.clearDisplay(0);
+  scoreBoards.clearDisplay(1);
+  delay(500);
   
   int number = currentScore;
   int i = 0;
   while (number > 0) {
     scoreBoards.setDigit(0,i,number % 10,false);
     number = number / 10;
-     i++;
+    i++;
   }
 
   // updated scoreboard to reflect currentHighScore
   //currentHighScore....
+  number = currentScore;
+  i = 0;
+  while (number > 0) {
+    scoreBoards.setChar(1,i,'-',true);
+    number = number / 10;
+    i++;
+  }
 }
 
 
@@ -195,6 +204,10 @@ void setup() {
   scoreBoards.shutdown(0,false);
   scoreBoards.setIntensity(0,0);
   scoreBoards.clearDisplay(0);
+
+  scoreBoards.shutdown(1,false);
+  scoreBoards.setIntensity(1,0);
+  scoreBoards.clearDisplay(1);
   delay(500);
 
   // setup game restart button & raise ball-door
@@ -214,6 +227,11 @@ void setup() {
 // Main Loop - Method immedately ran after setup/initaliztaion
 //****************************************************************************//
 void loop() {
+
+  digitalWrite(pinBallDoorMotor, HIGH);
+  delay(500);
+  digitalWrite(pinBallDoorMotor, LOW);
+  delay(500);
   
   // check game restart button - lower ball-door and then reset Arduino
   if (digitalRead(pinGameResetButton) == HIGH){
