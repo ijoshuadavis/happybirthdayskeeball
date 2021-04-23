@@ -31,7 +31,7 @@ const int pinBallButton100Left = 7; // the number of the pushbutton pin
 const int pinBallButton100Right = 8;// the number of the pushbutton pin
 const int pinGameResetButton = 9; 
 
-//const int pinBallDoorMotor = A4;    // the number of the motor pin
+const int pinBallDoorMotor = 10;    // the number of the motor pin
 const int pinScoreboardDataIn = A2; // the number of the Scoreboard High pin
 const int pinScoreboardCS = A4;     // the number of the Scoreboard Current pin
 const int pinScoreboardCLK = A3;    // the number of the Scoreboard Current pin
@@ -97,7 +97,7 @@ void AnnounceGameEnd() {
 void UpdateScoreboard() {
 
   // updated scoreboard to reflect currentScore
-  //currentScore....
+  scoreBoards.clearDisplay(0);
   
   int number = currentScore;
   int i = 0;
@@ -198,6 +198,7 @@ void setup() {
   delay(500);
 
   // setup game restart button & raise ball-door
+  pinMode(pinBallDoorMotor, OUTPUT);
   
   /// might need to pause the raise door to give the balls enough time to roll down
 
@@ -213,11 +214,9 @@ void setup() {
 // Main Loop - Method immedately ran after setup/initaliztaion
 //****************************************************************************//
 void loop() {
-
+  
   // check game restart button - lower ball-door and then reset Arduino
-  if (digitalRead(pinGameResetButton) == HIGH)
-  {
-
+  if (digitalRead(pinGameResetButton) == HIGH){
     scoreBoards.setChar(0,0,'-',false);
     scoreBoards.setChar(0,1,'-',false);
     scoreBoards.setChar(0,2,'-',false);
@@ -231,15 +230,10 @@ void loop() {
     digitalWrite(pinReset, LOW);
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // check balldrop count, if less than 9, determine button and increment score
-    
-
   if(ballCount == 9){
     scoreBoards.clearDisplay(0);
     delay(500);
-    //scoreBoards.clearDisplay(1);
     
     int number = currentScore;
     int i = 0;
