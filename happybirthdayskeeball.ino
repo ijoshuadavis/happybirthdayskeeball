@@ -107,7 +107,6 @@ void AnnounceGameEnd()
       number = number / 10;
       i++;
     }
-    delay(500);
 }
 
 //****************************************************************************//
@@ -122,25 +121,34 @@ void UpdateScoreboard()
 
   scoreBoards.clearDisplay(0);
 
-  int number = currentScore;
-  scoreBoards.setDigit(0,0,number % 10,false);
-  number = number / 10;
-  scoreBoards.setDigit(0,1,number % 10,false);
-  number = number / 10;
-  scoreBoards.setDigit(0,2,number % 10,false);
-  number = number / 10;
-  scoreBoards.setChar(0,3,number % 10,false);
-  number = number / 10;
+//  int number = currentScore;
+//  scoreBoards.setDigit(0,0,number % 10,false);
+//  number = number / 10;
+//  scoreBoards.setDigit(0,1,number % 10,false);
+//  number = number / 10;
+//  scoreBoards.setDigit(0,2,number % 10,false);
+//  number = number / 10;
+//  scoreBoards.setChar(0,3,number % 10,false);
+//  number = number / 10;
 
-  number = currentScore;
-  scoreBoards.setDigit(0,4,number % 10,false);
-  number = number / 10;
-  scoreBoards.setDigit(0,5,number % 10,false);
-  number = number / 10;
-  scoreBoards.setDigit(0,6,number % 10,false);
-  number = number / 10;
-  scoreBoards.setChar(0,7,number % 10,false);
-  number = number / 10; 
+//  number = currentScore;
+//  scoreBoards.setDigit(0,4,number % 10,false);
+// number = number / 10;
+//  scoreBoards.setDigit(0,5,number % 10,false);
+//  number = number / 10;
+//  scoreBoards.setDigit(0,6,number % 10,false);
+//  number = number / 10;
+//  scoreBoards.setChar(0,7,number % 10,false);
+//  number = number / 10; 
+
+    int number = currentScore;
+    int i = 0;
+    while (number > 0) {
+      scoreBoards.setDigit(0,i,number % 10,false);
+      number = number / 10;
+      i++;
+    }
+    delay(500);
    
 }
 
@@ -246,6 +254,7 @@ void setup()
 
   //START GAME
   AnnounceGameStartup();
+  delay(500);
 }
 
 
