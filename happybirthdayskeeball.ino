@@ -29,7 +29,7 @@ const int pinBallButton40 = 5;      // the number of the pushbutton pin
 const int pinBallButton50 = 6;      // the number of the pushbutton pin
 const int pinBallButton100Left = 7; // the number of the pushbutton pin
 const int pinBallButton100Right = 8;// the number of the pushbutton pin
-const int pinGameResetButton = 9; 
+const int pinGameResetButton = 9;   // the number of the pushbutton pin
 
 const int pinBallDoorMotor = 10;    // the number of the motor pin
 const int pinScoreboardDataIn = A2; // the number of the Scoreboard High pin
@@ -55,7 +55,7 @@ int currentHighScore = 0;           // varialbe pulled from EEPROM to see curren
 int ballCount = 0;                  // variable that keeps track of the balls
 
 //Scoreboard initialization
-LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScoreboardCLK,2);
+LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScoreboardCLK,1);
 
 
 
@@ -72,12 +72,21 @@ LedControl scoreBoards=LedControl(pinScoreboardDataIn,pinScoreboardCS,pinScorebo
 // AnnounceGameStartup - This method signals that new game start.  Maybe blinks
 // the current score if not better than high.  blinks both if high. It also will
 // initiate any additional feedback - blinking lights or playing sounds.
-void AnnounceGameStartup() {
+void AnnounceGameStartup() 
+{
   
-  // updated scoreboard to reflect currentScore of zero
-
-  // updated scoreboard to reflect currentHighScore
-
+    scoreBoards.clearDisplay(0);
+    delay(500);
+    scoreBoards.setChar(0,0,'A',false);
+    scoreBoards.setChar(0,1,'A',false);
+    scoreBoards.setChar(0,2,'A',false);
+    scoreBoards.setChar(0,3,' ',false);
+    scoreBoards.setChar(0,4,'A',false);
+    scoreBoards.setChar(0,5,'A',false);
+    scoreBoards.setChar(0,6,'A',false);
+    scoreBoards.setChar(0,7,' ',false);
+    delay(500);
+    scoreBoards.clearDisplay(0);
 }
 
 //****************************************************************************//
@@ -85,8 +94,20 @@ void AnnounceGameStartup() {
 // the current score if not better than high.  blinks both if high. It also will
 // initiate any additional feedback - blinking lights or playing sounds.
 //****************************************************************************//
-void AnnounceGameEnd() {
-
+void AnnounceGameEnd() 
+{
+    
+    scoreBoards.clearDisplay(0);
+    delay(500);
+    
+    int number = currentScore;
+    int i = 0;
+    while (number > 0) {
+      scoreBoards.setDigit(0,i,number % 10,false);
+      number = number / 10;
+      i++;
+    }
+    delay(500);
 }
 
 //****************************************************************************//
@@ -94,30 +115,33 @@ void AnnounceGameEnd() {
 // also will initiate any additional feedback - blinking lights or playing
 // sounds.
 //****************************************************************************//
-void UpdateScoreboard() {
+void UpdateScoreboard() 
+{
 
   // updated scoreboard to reflect currentScore
-  scoreBoards.clearDisplay(0);
-  scoreBoards.clearDisplay(1);
-  delay(500);
-  
-  int number = currentScore;
-  int i = 0;
-  while (number > 0) {
-    scoreBoards.setDigit(0,i,number % 10,false);
-    number = number / 10;
-    i++;
-  }
 
-  // updated scoreboard to reflect currentHighScore
-  //currentHighScore....
+  scoreBoards.clearDisplay(0);
+
+  int number = currentScore;
+  scoreBoards.setDigit(0,0,number % 10,false);
+  number = number / 10;
+  scoreBoards.setDigit(0,1,number % 10,false);
+  number = number / 10;
+  scoreBoards.setDigit(0,2,number % 10,false);
+  number = number / 10;
+  scoreBoards.setChar(0,3,number % 10,false);
+  number = number / 10;
+
   number = currentScore;
-  i = 0;
-  while (number > 0) {
-    scoreBoards.setChar(1,i,'-',true);
-    number = number / 10;
-    i++;
-  }
+  scoreBoards.setDigit(0,4,number % 10,false);
+  number = number / 10;
+  scoreBoards.setDigit(0,5,number % 10,false);
+  number = number / 10;
+  scoreBoards.setDigit(0,6,number % 10,false);
+  number = number / 10;
+  scoreBoards.setChar(0,7,number % 10,false);
+  number = number / 10; 
+   
 }
 
 
@@ -131,14 +155,16 @@ void UpdateScoreboard() {
 //****************************************************************************//
 // LowerBalldoor
 //****************************************************************************//
-void LowerBalldoor() {
+void LowerBalldoor() 
+{
   
 }
 
 //****************************************************************************//
 // RaiseBalldoor
 //****************************************************************************//
-void RaiseBalldoor() {
+void RaiseBalldoor() 
+{
   
 }
 
@@ -153,13 +179,15 @@ void RaiseBalldoor() {
 //****************************************************************************//
 // IncrementScore - 
 //****************************************************************************//
-void IncrementScore( int ballScore ) {
+void IncrementScore( int ballScore ) 
+{
 
   //update the current score
   currentScore = currentScore + ballScore;
 
   //test for for high score
-  if (currentScore > currentHighScore) {
+  if (currentScore > currentHighScore) 
+  {
     currentHighScore = currentScore;  
   }
   
@@ -181,7 +209,8 @@ void IncrementScore( int ballScore ) {
 //****************************************************************************//
 // Setup - Initialize all buttons, scoreboard, and open / close ball door
 //****************************************************************************//
-void setup() {
+void setup() 
+{
   // pull current high score from EEPROM and set to global currentHighScore variable
 
   // setup score buttons
@@ -204,10 +233,6 @@ void setup() {
   scoreBoards.shutdown(0,false);
   scoreBoards.setIntensity(0,0);
   scoreBoards.clearDisplay(0);
-
-  scoreBoards.shutdown(1,false);
-  scoreBoards.setIntensity(1,0);
-  scoreBoards.clearDisplay(1);
   delay(500);
 
   // setup game restart button & raise ball-door
@@ -219,69 +244,59 @@ void setup() {
   ////////DEBUGGING initialize the LED pin
   pinMode(pinLED, OUTPUT);
 
-
-
+  //START GAME
+  AnnounceGameStartup();
 }
+
+
 
 //****************************************************************************//
 // Main Loop - Method immedately ran after setup/initaliztaion
 //****************************************************************************//
-void loop() {
-
-  digitalWrite(pinBallDoorMotor, HIGH);
-  delay(500);
-  digitalWrite(pinBallDoorMotor, LOW);
-  delay(500);
+void loop() 
+{
   
   // check game restart button - lower ball-door and then reset Arduino
-  if (digitalRead(pinGameResetButton) == HIGH){
+  if (digitalRead(pinGameResetButton) == HIGH)
+  {
     scoreBoards.setChar(0,0,'-',false);
     scoreBoards.setChar(0,1,'-',false);
     scoreBoards.setChar(0,2,'-',false);
-    scoreBoards.setChar(0,3,'-',false);
+    scoreBoards.setChar(0,3,' ',false);
     scoreBoards.setChar(0,4,'-',false);
     scoreBoards.setChar(0,5,'-',false);
     scoreBoards.setChar(0,6,'-',false);
-    scoreBoards.setChar(0,7,'-',false);
+    scoreBoards.setChar(0,7,' ',false);
     
-    delay(2000);
+    delay(3000);
     digitalWrite(pinReset, LOW);
   }
 
   // check balldrop count, if less than 9, determine button and increment score
-  if(ballCount == 9){
-    scoreBoards.clearDisplay(0);
-    delay(500);
-    
-    int number = currentScore;
-    int i = 0;
-    while (number > 0) {
-      scoreBoards.setDigit(0,i,number % 10,false);
-      number = number / 10;
-      i++;
-    }
-    delay(500);
-    
+  if(ballCount == 9)
+  {
+
+    AnnounceGameEnd();
  
   }      
-  else if( ballCount < 9 ){
+  else if( ballCount < 9 )
+  {
     //10 POINT BALL
     if (digitalRead(pinBallButton10) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(10);
+      IncrementScore(valueBallButton10);
       ballCount++;
       
       //delay for button count...will probably need to leverage
       delay(1000);
-      
     }
 
     //20 POINT BALL
     if (digitalRead(pinBallButton20) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(20);
+      IncrementScore(valueBallButton20);
       ballCount++;
 
       //delay for button count...will probably need to leverage
@@ -292,7 +307,7 @@ void loop() {
     if (digitalRead(pinBallButton30) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(30);
+      IncrementScore(valueBallButton30);
       ballCount++;
 
       //delay for button count...will probably need to leverage
@@ -303,7 +318,7 @@ void loop() {
     if (digitalRead(pinBallButton40) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(40);
+      IncrementScore(valueBallButton40);
       ballCount++;
 
       //delay for button count...will probably need to leverage
@@ -314,7 +329,7 @@ void loop() {
     if (digitalRead(pinBallButton50) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(50);
+      IncrementScore(valueBallButton50);
       ballCount++;
 
       //delay for button count...will probably need to leverage
@@ -322,7 +337,7 @@ void loop() {
     }
   
     //100 POINT BALL LEFT
-    if (digitalRead(pinBallButton100Left) == HIGH)
+    if (digitalRead(valueBallButton100Left) == HIGH)
     {
       //call the function that increments and updates scoreboard
       IncrementScore(100);
@@ -336,7 +351,7 @@ void loop() {
     if (digitalRead(pinBallButton100Right) == HIGH)
     {
       //call the function that increments and updates scoreboard
-      IncrementScore(100);
+      IncrementScore(valueBallButton100Right);
       ballCount++;
 
       //delay for button count...will probably need to leverage
